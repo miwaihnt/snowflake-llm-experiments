@@ -1,17 +1,18 @@
-# Cortex Analyst 実験環境
+# Cortex Analyst 検証補助資料
 
 このディレクトリは、以下の記事の補助用です：
 
 - [Snowflake Cortex Analyst徹底検証 #1: Text-to-SQLの基本と単表/マルチターン精度を上げる設計](https://zenn.dev/nttdata_tech/articles/b7e27f17e348a7)
+- [Snowflake Cortex Analyst徹底検証 #2：JOIN編と検証から見えた設計上の考慮事項](https://zenn.dev/nttdata_tech/articles/305a605eac9f61)
 
 記事中で紹介した **検証シナリオを手元で再現できるようにする** ための Notebook と YAML を含んでいます。
 
 ---
 
 ## 📘 内容物
-
-- CortexAnalyst_L1.yml
-- setup_L1.ipynb
+- Cortex Analyst徹底検証 #1
+  - CortexAnalyst_L1.yml
+  - setup_L1.ipynb
 
 ---
 
