@@ -1,0 +1,101 @@
+name: L1_VIEW
+tables:
+  - name: SALES_L1
+    base_table:
+      database: CORTEX_LAB
+      schema: L1
+      table: SALES_L1
+    dimensions:
+      - name: CATEGORY
+        description: The category of the product being sold, such as food or drink items, which can be used to group and analyze sales data by product type.
+        expr: CATEGORY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Beverage
+          - Seafood
+          - Fruit
+      - name: ITEM_NAME
+        description: The name of the item being sold.
+        expr: ITEM_NAME
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Pork
+          - Cola
+          - Milk
+      - name: MONTH_NUM
+        synonyms:
+          - '"月"'
+          - '"month"'
+          - '"月番号"'
+        expr: DATE_PART('MONTH', ORDER_DATE)
+        data_type: NUMBER(2,0)
+    time_dimensions:
+      - name: FISCAL_YEAR
+        synonyms:
+          - '"会計年度"'
+          - '"年度"'
+          - '"FY"'
+          - '"FY年度"'
+        description: '"会計年度 (FY, April–March)"'
+        expr: CASE WHEN MONTH(order_date) >= 4      THEN YEAR(order_date)      ELSE YEAR(order_date) - 1 END
+        data_type: NUMBER(5,0)
+      - name: ORDER_DATE
+        description: Date on which the sales order was placed.
+        expr: ORDER_DATE
+        data_type: DATE
+        sample_values:
+          - '2024-09-18'
+          - '2023-04-10'
+          - '2023-08-13'
+      - name: YEAR
+        synonyms:
+          - '"年"'
+          - '"year"'
+          - '"暦年"'
+        expr: DATE_PART('YEAR', ORDER_DATE)
+        data_type: NUMBER(4,0)
+    facts:
+      - name: ITEM_ID
+        description: Unique identifier for each item sold.
+        expr: ITEM_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '1006'
+          - '1000'
+          - '1014'
+      - name: ORDER_ID
+        description: Unique identifier for each sales order.
+        expr: ORDER_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '98'
+          - '29'
+          - '1'
+      - name: PRICE
+        description: The amount of money received from a customer for a sale.
+        expr: PRICE
+        data_type: NUMBER(10,2)
+        access_modifier: public_access
+        sample_values:
+          - '2755.59'
+          - '3637.87'
+          - '4748.13'
+      - name: QUANTITY
+        description: The quantity of items sold in a single transaction.
+        expr: QUANTITY
+        data_type: NUMBER(4,0)
+        access_modifier: public_access
+        sample_values:
+          - '4'
+          - '2'
+          - '5'
+    metrics:
+      - name: AVG_ORDER_REVENUE
+        synonyms:
+          - 平均注文額
+          - 1件あたりの平均売上金額
+        description: 1件あたりの平均売上金額
+        expr: SUM(price * quantity) / NULLIF(COUNT(DISTINCT order_id), 0)
+        access_modifier: public_access
