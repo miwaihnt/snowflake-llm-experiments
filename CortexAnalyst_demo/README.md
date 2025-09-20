@@ -11,8 +11,8 @@
 
 ## 📘 内容物
 - Cortex Analyst徹底検証 #1
-  - CortexAnalyst_L1.yml
-  - setup_L1.ipynb
+  - cortex_analyst_semantic_view1.yml
+  - cortex_analyst_setup1.ipynb
 
 ---
 
@@ -28,7 +28,7 @@
 ---
 
 ### 2. セマンティックビュー定義
-- `CortexAnalyst_L1.yml` には、記事内で解説した **最終版の定義** を収録しています。  
+- `cortex_analyst_semantic_view1.yml` には、記事内で解説した **最終版の定義** を収録しています。  
 - 主な追加項目：
   - **会計年度（FISCAL_YEAR）**
   - **月番号（MONTH_NUM）**
