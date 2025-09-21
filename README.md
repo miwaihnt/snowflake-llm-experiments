@@ -1,4 +1,4 @@
-# Snowflake LLM Experiments
+[# Snowflake LLM Experiments
 
 This repository contains experiments combining **Snowflake** with **LLM features** (Cortex Analyst, Cortex Search, Bedrock RAG, etc.).  
 All experiments are reproducible with Snowflake Trial environments.
