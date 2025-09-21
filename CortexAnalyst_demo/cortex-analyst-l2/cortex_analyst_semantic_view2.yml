@@ -1,0 +1,459 @@
+name: L3_SEAMTIC
+tables:
+  - name: ITEM_DIM
+    base_table:
+      database: CORTEX_LAB
+      schema: L3
+      table: ITEM_DIM
+    dimensions:
+      - name: BRAND
+        synonyms:
+          - maker
+          - manufacturer
+          - label
+          - trademark
+          - company
+          - name
+          - producer
+        description: The brand name of the item, representing the manufacturer or supplier of the product.
+        expr: BRAND
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Nimbus
+          - Aurora
+          - Acme
+      - name: CATEGORY
+        synonyms:
+          - type
+          - classification
+          - group
+          - kind
+          - genre
+          - class
+          - sort
+          - designation
+        description: 'The category of the item, which can be one of the following: Beverage, Snack, or Seafood, indicating the type of product being sold.'
+        expr: CATEGORY
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Beverage
+          - Snack
+          - Sweets
+      - name: ITEM_NAME
+        synonyms:
+          - product_name
+          - item_description
+          - product_description
+          - item_title
+          - product_title
+        description: The type of beverage item being sold, such as Cola, Tea, or Coffee.
+        expr: ITEM_NAME
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Pork
+          - Cola
+          - Tea
+    facts:
+      - name: ITEM_ID
+        synonyms:
+          - item_key
+          - product_id
+          - item_number
+          - product_code
+          - item_identifier
+          - stock_id
+          - item_reference
+        description: Unique identifier for each item in the inventory.
+        expr: ITEM_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '1001'
+          - '1000'
+          - '1007'
+    primary_key:
+      columns:
+        - ITEM_ID
+  - name: REGION_DIM
+    base_table:
+      database: CORTEX_LAB
+      schema: L3
+      table: REGION_DIM
+    dimensions:
+      - name: REGION_NAME
+        synonyms:
+          - region_label
+          - geographic_area
+          - area_name
+          - territory_name
+          - location_name
+          - area_description
+          - 地域
+        description: The region in Japan where a store or customer is located.
+        expr: REGION_NAME
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Tohoku
+          - Kanto
+          - Hokkaido
+    facts:
+      - name: REGION_ID
+        synonyms:
+          - region_code
+          - geographic_area_id
+          - area_identifier
+          - territory_number
+          - zone_id
+        description: Unique identifier for a geographic region.
+        expr: REGION_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '20'
+          - '30'
+          - '10'
+    primary_key:
+      columns:
+        - REGION_ID
+  - name: SALES_L3
+    base_table:
+      database: CORTEX_LAB
+      schema: L3
+      table: SALES_L3
+    dimensions:
+      - name: ITEM_ID
+        synonyms:
+          - product_id
+          - item_number
+          - product_code
+          - article_id
+          - stock_id
+          - sku
+          - product_key
+        description: Unique identifier for each item sold.
+        expr: ITEM_ID
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '1003'
+          - '1039'
+          - '1010'
+      - name: STORE_ID
+        synonyms:
+          - store
+          - store_id
+          - store key
+          - 店舗
+          - 店舗ID
+          - 店舗コード
+          - 支店ID
+          - 店番号
+        description: Store identifier; foreign key referencing STORE_DIM.STORE_ID.
+        expr: STORE_ID
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '127'
+          - '115'
+          - '158'
+    time_dimensions:
+      - name: ORDER_DATE
+        synonyms:
+          - order_timestamp
+          - purchase_date
+          - transaction_date
+          - sale_date
+          - date_of_purchase
+          - order_creation_date
+          - order_placement_date
+        description: Date on which the sales order was placed.
+        expr: ORDER_DATE
+        data_type: DATE
+        sample_values:
+          - '2024-11-16'
+          - '2025-01-16'
+          - '2024-09-28'
+    facts:
+      - name: ORDER_ID
+        synonyms:
+          - order_number
+          - purchase_id
+          - transaction_id
+          - sales_id
+          - invoice_number
+        description: Unique identifier for each sales order.
+        expr: ORDER_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '100000'
+          - '100090'
+          - '100001'
+      - name: PRICE
+        synonyms:
+          - cost
+          - amount
+          - value
+          - rate
+          - charge
+          - fee
+          - tariff
+          - expense
+          - expenditure
+        description: The amount of money received from a customer for a sale.
+        expr: PRICE
+        data_type: NUMBER(10,2)
+        access_modifier: public_access
+        sample_values:
+          - '478.91'
+          - '215.28'
+          - '317.04'
+      - name: QUANTITY
+        synonyms:
+          - amount
+          - count
+          - volume
+          - number_of_items
+          - total_items
+          - item_count
+          - units
+          - stock_quantity
+          - inventory_level
+        description: The quantity of items sold in a single transaction.
+        expr: QUANTITY
+        data_type: NUMBER(4,0)
+        access_modifier: public_access
+        sample_values:
+          - '2'
+          - '1'
+          - '5'
+    metrics:
+      - name: REVENUE
+        synonyms:
+          - 売上
+          - 売上高
+          - 売上金額
+          - Sales
+          - Revenue
+          - GMV
+        description: Total sales amount (gross) calculated as unit price × quantity at the order-line grain. Aggregates across any dimension (region, store, category) via defined joins. Excludes taxes/discounts unless PRICE already reflects them.
+        expr: SUM(PRICE * QUANTITY)
+        access_modifier: public_access
+  - name: STORE_DIM
+    base_table:
+      database: CORTEX_LAB
+      schema: L3
+      table: STORE_DIM
+    dimensions:
+      - name: REGION_ID
+        synonyms:
+          - region_code
+          - geographic_area_id
+          - territory_id
+          - area_identifier
+          - location_id
+          - zone_id
+        description: A unique identifier for a geographic region where a store is located, used to categorize and analyze store performance by region.
+        expr: REGION_ID
+        data_type: NUMBER(38,0)
+        sample_values:
+          - '50'
+          - '30'
+          - '40'
+      - name: STORE_NAME
+        synonyms:
+          - store_title
+          - retail_name
+          - shop_name
+          - outlet_name
+          - business_name
+          - store_label
+          - retail_title
+          - merchant_name
+        description: The name of the retail store location.
+        expr: STORE_NAME
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Store_002
+          - Store_003
+          - Store_015
+      - name: STORE_TYPE
+        synonyms:
+          - store_category
+          - store_classification
+          - retail_type
+          - outlet_type
+          - business_type
+          - store_format
+          - store_classification_code
+        description: The type of location where the store is situated, such as a shopping mall, a metropolitan area, or a suburban area.
+        expr: STORE_TYPE
+        data_type: VARCHAR(16777216)
+        sample_values:
+          - Suburban
+          - Mall
+          - Metro
+    time_dimensions:
+      - name: OPEN_DATE
+        synonyms:
+          - launch_date
+          - start_date
+          - opening_day
+          - commencement_date
+          - inception_date
+          - activation_date
+        description: The date on which the store first opened for business.
+        expr: OPEN_DATE
+        data_type: DATE
+        sample_values:
+          - '2023-09-07'
+          - '2019-03-04'
+          - '2016-06-01'
+    facts:
+      - name: STORE_ID
+        synonyms:
+          - store_number
+          - store_code
+          - retail_store_id
+          - outlet_id
+          - shop_id
+          - store_key
+        description: Unique identifier for a retail store location.
+        expr: STORE_ID
+        data_type: NUMBER(38,0)
+        access_modifier: public_access
+        sample_values:
+          - '101'
+          - '102'
+          - '108'
+    primary_key:
+      columns:
+        - STORE_ID
+relationships:
+  - name: SALES_TO_ITEM
+    left_table: SALES_L3
+    right_table: ITEM_DIM
+    relationship_columns:
+      - left_column: ITEM_ID
+        right_column: ITEM_ID
+  - name: SALES_TO_STORE
+    left_table: SALES_L3
+    right_table: STORE_DIM
+    relationship_columns:
+      - left_column: STORE_ID
+        right_column: STORE_ID
+  - name: STORE_TO_REGION
+    left_table: STORE_DIM
+    right_table: REGION_DIM
+    relationship_columns:
+      - left_column: REGION_ID
+        right_column: REGION_ID
+verified_queries:
+  - name: 店舗×カテゴリごとの売上クロス集計を出して
+    question: 店舗×カテゴリごとの売上クロス集計を出して
+    sql: |-
+      WITH store_category_revenue AS (
+        SELECT
+          s.store_id,
+          st.store_name,
+          i.category,
+          SUM(s.price * s.quantity) AS revenue
+        FROM
+          sales_l3 AS s
+          LEFT OUTER JOIN store_dim AS st ON s.store_id = st.store_id
+          LEFT OUTER JOIN item_dim AS i ON s.item_id = i.item_id
+        WHERE
+          DATE_PART('year', s.order_date) = 2024
+        GROUP BY
+          s.store_id,
+          st.store_name,
+          i.category
+      ),
+      pivot_table AS (
+        SELECT
+          store_name,
+          SUM(
+            CASE
+              WHEN category = 'Beverage' THEN revenue
+              ELSE 0
+            END
+          ) AS Beverage,
+          SUM(
+            CASE
+              WHEN category = 'Snack' THEN revenue
+              ELSE 0
+            END
+          ) AS Snack,
+          SUM(
+            CASE
+              WHEN category = 'Sweets' THEN revenue
+              ELSE 0
+            END
+          ) AS Sweets,
+          SUM(
+            CASE
+              WHEN category = 'Meat' THEN revenue
+              ELSE 0
+            END
+          ) AS Meat,
+          SUM(
+            CASE
+              WHEN category = 'Seafood' THEN revenue
+              ELSE 0
+            END
+          ) AS Seafood,
+          SUM(
+            CASE
+              WHEN category = 'Vegetable' THEN revenue
+              ELSE 0
+            END
+          ) AS Vegetable,
+          SUM(
+            CASE
+              WHEN category = 'Fruit' THEN revenue
+              ELSE 0
+            END
+          ) AS Fruit,
+          SUM(
+            CASE
+              WHEN category = 'Dairy' THEN revenue
+              ELSE 0
+            END
+          ) AS Dairy,
+          SUM(
+            CASE
+              WHEN category = 'Staple' THEN revenue
+              ELSE 0
+            END
+          ) AS Staple,
+          SUM(
+            CASE
+              WHEN category = 'Other' THEN revenue
+              ELSE 0
+            END
+          ) AS Other,
+          SUM(revenue) AS Total
+        FROM
+          store_category_revenue
+        GROUP BY
+          store_name
+      )
+      SELECT
+        store_name,
+        Beverage,
+        Snack,
+        Sweets,
+        Meat,
+        Seafood,
+        Vegetable,
+        Fruit,
+        Dairy,
+        Staple,
+        Other,
+        Total
+      FROM
+        pivot_table
+      ORDER BY
+        store_name
+        /* Generated by Cortex Analyst */
+    use_as_onboarding_question: false
+    verified_by: Shuhei Miwa
+    verified_at: 1758461176
